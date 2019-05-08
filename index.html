@@ -1,0 +1,266 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import plotly
+import plotly.plotly as py
+import plotly.figure_factory as ff
+import plotly.graph_objs as go
+
+import zipfile
+import os
+
+from IPython import display
+from ipywidgets import interact, widgets
+py.sign_in('Danleiq','0B9StCARMXHwyAhideOQ')
+plotly.offline.init_notebook_mode()
+zipfile.ZipFile('Trasportation Means.zip').extractall('.')
+os.listdir('Trasportation Means')[:10]
+
+#Data preprocessing and cleaning
+trans_all = []
+for year in range(2006,2017+1):
+    trans_all.append(pd.read_csv('Trasportation Means/ACS_{}_1YR_B08006_with_ann.csv'.format(year)))
+                                
+    trans_all[-1]['year'] = year #append the year column as the last one
+ allyears = pd.concat(trans_all)
+ 
+allyears_clean = allyears_class.rename(columns={'Estimate; Total:':'Total','Estimate; Car, truck, or van:':'Car, truck, or van','Estimate; Public transportation (excluding taxicab):':'Public transportation','Estimate; Bicycle':'Bicycle','Estimate; Walked':'Walked','Estimate; Taxicab, motorcycle, or other means':'Taxicab, motorcycle, or other means','Estimate; Worked at home':'Worked at home',
+                                                'Estimate; Male:':'Male','Estimate; Male: - Car, truck, or van:':'Male-Car, truck, or van','Estimate; Male: - Public transportation (excluding taxicab):':'Male-Public transportation','Estimate; Male: - Bicycle':'Male-Bicycle','Estimate; Male: - Walked':'Male-Walked','Estimate; Male: - Taxicab, motorcycle, or other means':'Male-Taxicab, motorcycle, or other means','Estimate; Male: - Worked at home':'Male-Worked at home',
+                                                'Estimate; Female:':'Female','Estimate; Female: - Car, truck, or van:':'Female-Car, truck, or van','Estimate; Female: - Public transportation (excluding taxicab):':'Female-Public transportation','Estimate; Female: - Bicycle':'Female-Bicycle','Estimate; Female: - Walked':'Female-Walked','Estimate; Female: - Taxicab, motorcycle, or other means':'Female-Taxicab, motorcycle, or other means','Estimate; Female: - Worked at home':'Female-Worked at home'})
+
+allyears_clean.tail()
+allyears_index_geo=allyears_clean.set_index(["Geography"], inplace=False)
+allyears_index_geo.head()
+allyears_sum = allyears_index_geo.loc[['United States'],:]
+allyears_sum.head()
+
+allyears_sum_indexed = allyears_sum.set_index(['year']).loc[:,['Car, truck, or van','Public transportation','Bicycle','Walked','Taxicab, motorcycle, or other means','Worked at home']]
+allyears_sum_indexed.head()
+
+allyears_sum_indexed.plot(kind='line',linewidth=1,figsize=(10,6),color=('red','green','lightblue','purple','grey','gold'))
+plt.title('Transportation Means from 2006 to 2017')
+plt.ylabel("Numbers")  
+plt.legend(loc='best',ncol=1)
+plt.show()
+
+##Based on sates
+allyears_index_year = allyears_clean.set_index(["year"], inplace=False)
+allyears_index_year.head()
+
+year_2006 = allyears_index_year.ix['2006']
+year_2006.head()
+
+state_index = pd.read_csv('States index.csv',header=0,index_col=0)
+state_index.head()
+
+
+map_2006 = year_2006.merge(state_index, left_on='Geography', right_on='States').ix[:,['States_index','Geography','Total','Car, truck, or van','Public transportation','Bicycle','Walked','Taxicab, motorcycle, or other means','Worked at home']]
+map_2006.head()
+
+#2006 Overall
+for col in map_2006.columns:
+    map_2006[col] = map_2006[col].astype(str)
+
+scl = [[0.0, 'rgb(225,238,210)'], [0.2, 'rgb(179,213,110)'], 
+        [0.4, 'rgb(160,191,124)'], [0.6, 'rgb(101,147,74)'], [0.8, 'rgb(64,116,52)'],
+        [1.0, 'rgb(17,63,61)']]
+
+map_2006['text'] = map_2006['Geography'] + '<br>' + \
+    'Car, truck, or van' + map_2006['Car, truck, or van'] + '<br>' + \
+    'Public transportation ' + map_2006['Public transportation'] + '<br>' + \
+    'Bicycle' + map_2006['Bicycle'] + ' Walked ' + map_2006['Walked'] + '<br>' + \
+    'Taxicab, motorcycle, or other means ' + map_2006['Taxicab, motorcycle, or other means'] + '<br>' + \
+    'Worked at home' + map_2006['Worked at home']
+
+data = [go.Choropleth(
+    colorscale = scl,
+    autocolorscale = False,
+    locations = map_2006['States_index'],
+    z = map_2006['Total'].astype(float),
+    locationmode = 'USA-states',
+    text = map_2006['text'],
+    marker = go.choropleth.Marker(
+        line = go.choropleth.marker.Line(
+            color = 'rgb(255,255,255)',
+            width = 2
+        )),
+    colorbar = go.choropleth.ColorBar(
+        title = "Total Number of Transportation Means")
+)]
+
+layout = go.Layout(
+    title = go.layout.Title(
+        text = '2006 US Transportation Means to work'
+    ),
+    geo = go.layout.Geo(
+        scope = 'usa',
+        projection = go.layout.geo.Projection(type = 'albers usa'),
+        showlakes = True,
+        lakecolor = 'rgb(255, 255, 255)'),
+)
+
+fig = go.Figure(data = data, layout = layout)
+py.iplot(fig, filename = '2006total')
+
+year_2017 = allyears_index_year.ix['2017']
+map_2017 = year_2017.merge(state_index, left_on='Geography', right_on='States').loc[:,['States_index','Geography','Total','Car, truck, or van','Public transportation','Bicycle','Walked','Taxicab, motorcycle, or other means','Worked at home']]
+map_2017.head()
+
+#2017 Overall
+for col in map_2017.columns:
+    map_2017[col] = map_2017[col].astype(str)
+
+scl = [[0.0, 'rgb(225,238,210)'], [0.2, 'rgb(179,213,110)'], 
+        [0.4, 'rgb(160,191,124)'], [0.6, 'rgb(101,147,74)'], [0.8, 'rgb(64,116,52)'],
+        [1.0, 'rgb(17,63,61)']]
+
+map_2017['text'] = map_2017['Geography'] + '<br>' + \
+    'Car, truck, or van' + map_2017['Car, truck, or van'] + '<br>' + \
+    'Public transportation ' + map_2017['Public transportation'] + '<br>' + \
+    'Bicycle' + map_2017['Bicycle'] + ' Walked ' + map_2017['Walked'] + '<br>' + \
+    'Taxicab, motorcycle, or other means ' + map_2017['Taxicab, motorcycle, or other means'] + '<br>' + \
+    'Worked at home' + map_2017['Worked at home']
+
+data = [go.Choropleth(
+    colorscale = scl,
+    autocolorscale = False,
+    locations = map_2006['States_index'],
+    z = map_2017['Total'].astype(float),
+    locationmode = 'USA-states',
+    text = map_2017['text'],
+    marker = go.choropleth.Marker(
+        line = go.choropleth.marker.Line(
+            color = 'rgb(255,255,255)',
+            width = 2
+        )),
+    colorbar = go.choropleth.ColorBar(
+        title = "Total Number of Transportation Means")
+)]
+
+layout = go.Layout(
+    title = go.layout.Title(
+        text = '2017 US Transportation Means to work'
+    ),
+    geo = go.layout.Geo(
+        scope = 'usa',
+        projection = go.layout.geo.Projection(type = 'albers usa'),
+        showlakes = True,
+        lakecolor = 'rgb(255, 255, 255)'),
+)
+
+fig = go.Figure(data = data, layout = layout)
+py.iplot(fig, filename = '2017total')
+
+#Car, truck, or van
+for col in map_2017.columns:
+    map_2017[col] = map_2017[col].astype(str)
+
+scl = [[0.0, 'rgb(225,238,210)'], [0.2, 'rgb(179,213,110)'], 
+        [0.4, 'rgb(160,191,124)'], [0.6, 'rgb(101,147,74)'], [0.8, 'rgb(64,116,52)'],
+        [1.0, 'rgb(17,63,61)']]
+
+map_2017['text'] = map_2017['Geography'] + '<br>' + \
+    'Car, truck, or van' + map_2017['Car, truck, or van'] + '<br>' + \
+    'Public transportation ' + map_2017['Public transportation'] + '<br>' + \
+    'Bicycle' + map_2017['Bicycle'] + ' Walked ' + map_2017['Walked'] + '<br>' + \
+    'Taxicab, motorcycle, or other means ' + map_2017['Taxicab, motorcycle, or other means'] + '<br>' + \
+    'Worked at home' + map_2017['Worked at home']
+
+data = [go.Choropleth(
+    colorscale = scl,
+    autocolorscale = False,
+    locations = map_2006['States_index'],
+    z = map_2017['Car, truck, or van'].astype(float),
+    locationmode = 'USA-states',
+    text = map_2017['text'],
+    marker = go.choropleth.Marker(
+        line = go.choropleth.marker.Line(
+            color = 'rgb(255,255,255)',
+            width = 2
+        )),
+    colorbar = go.choropleth.ColorBar(
+        title = "Number")
+)]
+
+layout = go.Layout(
+    title = go.layout.Title(
+        text = 'Number of Car, Truck, or Van Used in 2017'
+    ),
+    geo = go.layout.Geo(
+        scope = 'usa',
+        projection = go.layout.geo.Projection(type = 'albers usa'),
+        showlakes = True,
+        lakecolor = 'rgb(255, 255, 255)'),
+)
+
+fig = go.Figure(data = data, layout = layout)
+py.iplot(fig, filename = '2017 Car, truck, or van')
+
+#Public transportation
+for col in map_2017.columns:
+    map_2017[col] = map_2017[col].astype(str)
+
+scl = [[0.0, 'rgb(225,238,210)'], [0.2, 'rgb(179,213,110)'], 
+        [0.4, 'rgb(160,191,124)'], [0.6, 'rgb(101,147,74)'], [0.8, 'rgb(64,116,52)'],
+        [1.0, 'rgb(17,63,61)']]
+
+map_2017['text'] = map_2017['Geography'] + '<br>' + \
+    'Public transportation ' + map_2017['Public transportation'] 
+
+data = [go.Choropleth(
+    colorscale = scl,
+    autocolorscale = False,
+    locations = map_2006['States_index'],
+    z = map_2017['Public transportation'].astype(float),
+    locationmode = 'USA-states',
+    text = map_2017['text'],
+    marker = go.choropleth.Marker(
+        line = go.choropleth.marker.Line(
+            color = 'rgb(255,255,255)',
+            width = 2
+        )),
+    colorbar = go.choropleth.ColorBar(
+        title = "Number")
+)]
+
+layout = go.Layout(
+    title = go.layout.Title(
+        text = 'Number of Public Transportation Used in 2017'
+    ),
+    geo = go.layout.Geo(
+        scope = 'usa',
+        projection = go.layout.geo.Projection(type = 'albers usa'),
+        showlakes = True,
+        lakecolor = 'rgb(255, 255, 255)'),
+)
+
+fig = go.Figure(data = data, layout = layout)
+py.iplot(fig, filename = '2017 Public transportation')
+
+
+##Based on gender
+allyears_male = allyears_clean.merge(state_index, left_on='Geography', right_on='States').loc[:,['Male-Car, truck, or van','Male-Public transportation','Male-Bicycle','Male-Walked','Male-Taxicab, motorcycle, or other means','Male-Worked at home','year']]
+allyears_male_year = allyears_male.groupby('year',as_index=False).sum()
+allyears_male_year.head()
+
+allyears_female = allyears_clean.merge(state_index, left_on='Geography', right_on='States').loc[:,['Female-Car, truck, or van','Female-Public transportation','Female-Bicycle','Female-Walked','Female-Taxicab, motorcycle, or other means','Female-Worked at home','year']]
+allyears_female_year = allyears_female.groupby('year',as_index=False).sum()
+allyears_female_year.head()
+
+def plotyear(year):
+    data = allyears_male_year[allyears_male_year.year == year].drop(['year'],axis=1)
+    data.plot(kind='barh',figsize=(10,4),width=0.4,color=('yellowgreen','steelblue','orange','tomato','lightblue','lightpink'))
+    plt.title('U.S Transportation Means of Male from 2006 to 2017')
+    plt.ylabel("Means")
+    plt.xlabel("Numbers")
+    
+interact(plotyear, year=widgets.IntSlider(min=2006,max=2017,step=1,value=2006))
+
+def plotyear(year):
+    data = allyears_female_year[allyears_female_year.year == year].drop(['year'],axis=1)
+    data.plot(kind='barh',figsize=(10,4),width=0.4,color=('yellowgreen','steelblue','orange','tomato','lightblue','lightpink'))
+    plt.title('U.S Transportation Means of Female from 2006 to 2017')
+    plt.ylabel("Means")
+    plt.xlabel("Numbers")
+    
+interact(plotyear, year=widgets.IntSlider(min=2006,max=2017,step=1,value=2006))
