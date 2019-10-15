@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+	<title>DATS 6401 - Individual Project</title>
+	<link rel="stylesheet" type="text/css" href="style.css" />
+	<script type="text/javascript"
+			src="https://www.gstatic.com/charts/loader.js"></script>
+
+</head>
+
+<body>
+	<div class="content">
+		<div id="main">
+			<div id="header">
+				<div id="logo">
+					<div id="logo_text">
+						<h1><a href="index.html">
+								Military, Health, Education Spending 
+						    </a></h1>
+						<h2>Top 12 Countries</h2>
+					</div><!-- logo_text -->
+				</div><!--logo-->
+				<div id="menubar">
+					<ul id="menu">
+						<li class="selected"><a href="index.html">Home</a></li>
+						<li><a href="overview.html">Overview</a></li>
+						<li><a href="Spending vs GPD.html">Spending vs GPD</a></li>
+						<li><a href="Per person value.html">Per person value</a></li>
+						<li><a href="Spending Trends.html">Spending Trends</a></li>
+						<li><a href="summary.html">Summary</a></li>
+					</ul>
+				</div><!--menubar-->
+			</div><!-- header-->
+				<div>
+					<img src="images/world-bank.jpg" id="mainImage" width="600" height="300" />
+				</div>
+				<div id="content">
+					<!--insert page content here-->
+					<h1>Data Sources</h1>
+					<ul>
+					<li><a href="https://data.worldbank.org/indicator/MS.MIL.XPND.GD.ZS?end=2016&start=2012" class="selected"> Military Expenditure</a></li>
+					<li><a href="https://data.worldbank.org/indicator/SH.XPD.CHEX.GD.ZS?end=2016&start=2012" class="selected">Healthcare Expenditure</a></li>
+					<li><a href="https://data.worldbank.org/indicator/SE.XPD.TOTL.GD.ZS?end=2016&start=2012" class="selected"> Education Expenditure</a></li>
+					<li><a href="https://data.worldbank.org/indicator/NY.GDP.MKTP.CD?end=2016&start=2012" class="selected">GDP by Country</a></li>
+					<li><a href="https://data.worldbank.org/indicator/SP.POP.TOTL?end=2016&start=2012" class="selected">Population by Country</a></li>
+					</ul>
+					<h1>Project Introduction</h1>
+					<h5>The dataset was downloaded from the worldbank website ,including the government expenditure on military, health and education from 12 top countries in G20 over 2012 to 2016 periods. This report is the country level's analysis of the three kinds of expenditure compared with GDP. </h5>
+					<h1>Analytical Tools: </h1>
+					<h5>Data preprocessing -- Python and Excel</h5>
+					<h5>Data visualization -- Google API</h5>
+
+				</div><!--content-->
+
+			</div><!--site_content-->	
+
+		</div>
+
+		<footer class="footer">
+
+			<div id="footer">
+					 <script>
+						var d=new Date(); document.write(d.getFullYear());
+					</script>
+					| DATS6401 Project | &reg; Danlei Qian | The George Washington University |
+			</div><!--footer-->
+		</div>
+	</div>
+</body>
+</html>
